@@ -1,20 +1,33 @@
-class DataAggregator
-  include GranualityLevel
-
+module DataAggregator
   ActiveRecord::Base.logger = nil
 
   #Data aggregation method - input takes chatroom and granuality level
   #TODO: user should have access to the chat room
-  def self.group_by(chat_room, granuality_level)
-    puts granuality_level
-
-    case granuality_level
-    when GranualityLevel::MINUTE
-      events_by_granuality = self.group_events_by chat_room, "beginning_of_minute", '%I:%M %p'
-      puts basic_presenter(events_by_granuality)
-    else
-      events_by_granuality = self.group_events_by chat_room, "beginning_of_hour", '%I %p'
-      puts presenter(events_by_granuality)
+  def self.group_by(chat_room, granularity_level)
+    begin
+      puts granularity_level
+      case granularity_level
+      when GranularityLevel::MINUTE
+        events_by_granuality = self.group_events_by chat_room, "beginning_of_minute", '%I:%M %p'
+        puts minimal_presenter(events_by_granuality)
+      when GranularityLevel::HOUR
+        events_by_granuality = self.group_events_by chat_room, "beginning_of_hour", '%I %p'
+        puts presenter(events_by_granuality)
+      when GranularityLevel::DAY
+        events_by_granuality = self.group_events_by chat_room, "beginning_of_day", '%D'
+        puts presenter(events_by_granuality)
+      when GranularityLevel::WEEK
+        events_by_granuality = self.group_events_by chat_room, "beginning_of_week", 'year: %Y week: %w'
+        puts presenter(events_by_granuality)
+      when GranularityLevel::MONTH
+        events_by_granuality = self.group_events_by chat_room, "beginning_of_month", 'year: %Y month: %m'
+        puts presenter(events_by_granuality)
+      when GranularityLevel::YEAR
+        events_by_granuality = self.group_events_by chat_room, "beginning_of_hour", '%Y'
+        puts presenter(events_by_granuality)
+      end
+    rescue Exception => e
+      Rails.logger.error
     end
   end
 
@@ -49,7 +62,7 @@ class DataAggregator
     aggregated_data
   end
 
-  def self.basic_presenter(events_by_granuality, aggregated_data = "")
+  def self.minimal_presenter(events_by_granuality, aggregated_data = "")
     events_by_granuality.map do |time, events|
       events.map do |event|
         aggregated_data = aggregated_data + "#{time}: #{event.initiating_user.username} #{event.event_type.description.split(" : ").first}" +

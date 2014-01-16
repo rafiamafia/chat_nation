@@ -1,4 +1,4 @@
-module GranualityLevel
+module GranularityLevel
   MINUTE = "Granuality: minute_by_minute"
   HOUR   = "Granuality: hourly"
   DAY    = "Granuality: daily"
