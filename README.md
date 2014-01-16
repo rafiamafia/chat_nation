@@ -1,5 +1,3 @@
-== README
-
 ChatRoom
 =====
 How to create a new user?
@@ -28,7 +26,8 @@ The ChatRoom is the mediator and the users use the mediator to
 communicate with each other. All the above chat events delegte
 to the ChatRoom class.
 
-##DataAggregation
+DataAggregation
+=====
 A user that has access to a chat room can view data based on a granularity level
 
 GranularityLevel module gives various levels: minute_by_minute, hourly, weekly, daily...etc
