@@ -1,5 +1,14 @@
 require 'spec_helper'
 
 describe Event do
-  pending "add some examples to (or delete) #{__FILE__}"
+  context 'validation' do
+    it 'must belong to an event_type' do
+    end
+
+    it 'must have a chat room' do
+    end
+
+    it 'must have an initiating user' do
+    end
+  end
 end

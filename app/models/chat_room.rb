@@ -7,17 +7,6 @@ class ChatRoom < ActiveRecord::Base
   has_and_belongs_to_many :users
   belongs_to :initiating_user, class_name: "User"
 
-  #EventType.all.each do |event_type|
-  #  define_method(event_type.name) do |user, params={}|
-  #    if self.users.include?
-  #      puts "#{Time.now.strftime('%H:%M%P')}: #{user.username} #{event_type.description}"
-  #      event = Event.create initiating_user: user, event_type: event_type
-  #      self.events << event
-  #  else
-  #    invalid_user_error user
-  #  end
-  #end
-
   def enter_the_room(user = self.initiating_user)
     if !self.users.include? user
       puts "#{Time.now.strftime('%H:%M%P')}: #{user.username} enters the room"
