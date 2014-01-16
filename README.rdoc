@@ -1,28 +1,28 @@
 == README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+##ChatRoom
+How to create a new user?
+User.create username: "must give a username"
 
-Things you may want to cover:
+How to create a new chat_room?
+ChatRoom.create title: "must have a title", initiating_user: User.find_by(name: "must have a creater - maybe admins can create in the future")
 
-* Ruby version
+How to let a user communicate?
+User has different chat events
 
-* System dependencies
+user.enter_a_chat_room(pass_the_room)
+user.leave_the_chat_room(pass_the_room)
+user.send_message(pass_the_room, what_ever_he_wants_to_say)
+user.send_high_five_to(pass_the_room, receiving_user_who_is_also_in_the_room)
 
-* Configuration
+The ChatRoom is the mediator and the users use the mediator to
+communicate with each other. All the above chat events delegte
+to the ChatRoom class.
 
-* Database creation
+##DataAggregation
+A user that has access to a chat room can view data based on a granularity level
 
-* Database initialization
+GranularityLevel module gives various levels: minute_by_minute, hourly, weekly, daily...etc
+In order to aggregate chatroom data:
 
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
-
-
-Please feel free to use a different markup language if you do not plan to run
-<tt>rake doc:app</tt>.
+DataAggregator.group_by(granularity_level, pass_the_chat_room)
