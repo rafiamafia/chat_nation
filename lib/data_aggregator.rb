@@ -1,11 +1,10 @@
 module DataAggregator
   ActiveRecord::Base.logger = nil
 
-  #Data aggregation method - input takes chatroom and granuality level
-  #TODO: user should have access to the chat room
   def self.group_by(chat_room, granularity_level)
     begin
       puts granularity_level
+
       case granularity_level
       when GranularityLevel::MINUTE
         events_by_granuality = self.group_events_by chat_room, "beginning_of_minute", '%I:%M %p'
@@ -27,15 +26,11 @@ module DataAggregator
         puts presenter(events_by_granuality)
       end
     rescue Exception => e
-      Rails.logger.error
+      Rails.logger.error "There is an error with aggregating data for #{chat_room.inspec}. Error: #{e.inspect}"
     end
   end
 
   private
-
-  def self.set_sql_logger(level=nil)
-    ActiveRecord::Base.logger = level
-  end
 
   define_singleton_method(:group_events_by) do |chat_room, granuality, strformat|
     Event.where(chat_room: chat_room).group_by do |event|
@@ -46,6 +41,7 @@ module DataAggregator
   def self.presenter(events_by_granuality, aggregated_data = "")
     events_by_granuality.map do |time, event_by_granuality|
       events_by_type = event_by_granuality.group_by { |event| [type: event.event_type.name, description: event.event_type.description] }
+
       aggregated_data = "#{time}: "
       events_by_type.map do |event_type, events|
         case event_type.first[:type]
@@ -53,7 +49,7 @@ module DataAggregator
           event_description = event_type.first[:description].split(" : ").last
           aggregated_data = aggregated_data + high_five_event_presenter(events, event_description)
         when "enter"
-          aggregated_data = aggregated_data + "#{events.count} #{ events.count > 1 ? 'people' : 'person' } #{event_type.first[:description].split(" : ").last}\n"
+          aggregated_data = aggregated_data + "#{events.count} #{people_text_presenter(events.count)} #{event_type.first[:description].split(" : ").last}\n"
         else
           aggregated_data = aggregated_data + "#{events.count} #{event_type.first[:description].split(" : ").last}\n"
         end
@@ -74,12 +70,17 @@ module DataAggregator
   end
 
   def self.high_five_event_presenter(events, description)
+    #group by uniqueness of initiating users and receiving users
     sets = events.group_by { |event| [event.initiating_user_id, event.receiving_user_id] }.keys
     initiating_user_count = sets.map(&:first).uniq.count
     receiving_user_count  = sets.map(&:last).uniq.count
 
-    "#{initiating_user_count} #{initiating_user_count > 1 ? 'people' : 'person'} " +
-      description + " #{receiving_user_count} other #{receiving_user_count > 1 ? 'people' : 'person'}\n"
+    "#{initiating_user_count} #{people_text_presenter(initiating_user_count)} " +
+      description + " #{receiving_user_count} other #{people_text_presenter(receiving_user_count)}\n"
+  end
+
+  def self.people_text_presenter(people_count)
+    people_count > 1 ? 'people' : 'person'
   end
 
 end
