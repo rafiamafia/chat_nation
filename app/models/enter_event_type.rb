@@ -1,0 +1,2 @@
+class EnterEventType < Event
+end
