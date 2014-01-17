@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140113030118) do
+ActiveRecord::Schema.define(version: 20140116213626) do
 
   create_table "chat_rooms", force: true do |t|
     t.string   "title"
@@ -50,6 +50,11 @@ ActiveRecord::Schema.define(version: 20140113030118) do
   add_index "events", ["event_type_id"], name: "index_events_on_event_type_id", using: :btree
   add_index "events", ["initiating_user_id"], name: "index_events_on_initiating_user_id", using: :btree
   add_index "events", ["receiving_user_id"], name: "index_events_on_receiving_user_id", using: :btree
+
+  create_table "friendships", force: true do |t|
+    t.integer "user_id"
+    t.integer "friend_id"
+  end
 
   create_table "users", force: true do |t|
     t.string   "username"
